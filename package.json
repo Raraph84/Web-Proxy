@@ -1,8 +1,8 @@
 {
   "name": "web-proxy",
   "version": "1.0.0",
-  "description": "",
+  "description": "Un simple proxy web créé à l'aide de NodeJS",
   "main": "index.js",
-  "author": "",
+  "author": "Raraph84",
   "license": "ISC"
 }

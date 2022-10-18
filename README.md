@@ -1,3 +1,3 @@
 # WebProxy
 
-Simple proxy web
+Un simple proxy web créé à l'aide de NodeJS
