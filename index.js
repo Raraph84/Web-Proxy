@@ -1,6 +1,5 @@
 const Http = require("http");
 const Https = require("https");
-const Config = require("./config.json");
 
 const server = Http.createServer((req, res) => {
 
@@ -8,16 +7,29 @@ const server = Http.createServer((req, res) => {
     req.on("data", (chunk) => data += chunk);
     req.on("end", () => {
 
-        const headers = req.headers;
-        headers.host = Config.host.split("/")[2];
+        try {
 
-        (Config.host.startsWith("https") ? Https : Http).request(Config.host + req.url, { method: req.method, headers }, (result) => {
+            const url = req.url.slice(req.url.startsWith("/") ? 1 : 0);
 
-            res.writeHead(result.statusCode, result.headers);
-            result.pipe(res, { end: true });
+            const host = req.headers.host;
+            delete req.headers.host;
 
-        }).end(data);
+            (url.split(":")[0] === "https" ? Https : Http).request(url, { method: req.method, headers: req.headers }, (result) => {
+
+                if (result.statusCode === 301 || result.statusCode === 302)
+                    result.headers.location = "http://" + host + "/" + result.headers.location;
+
+                res.writeHead(result.statusCode, result.headers);
+                result.pipe(res);
+
+            }).end(data);
+
+        } catch (error) {
+
+            res.writeHead(400);
+            res.end("Invalid proxy request or the requested server is down.");
+        }
     });
 });
 
-server.listen(Config.port, () => console.log("Proxy launched on port " + Config.port + " !"));
+server.listen((process.env.PORT || 8080), () => console.log("Proxy launched on port " + (process.env.PORT || 8080) + " !"));

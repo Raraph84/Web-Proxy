@@ -1,3 +1,3 @@
 # WebProxy
 
-Simple proxy web configurable dans le fichier config.json
+Simple proxy web
